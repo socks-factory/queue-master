@@ -1,4 +1,19 @@
-FROM java:openjdk-8-alpine
+FROM maven:3.8-jdk-8 AS build
+
+ARG BUILD_DATE=""
+ARG BUILD_VERSION="0.0.2-SNAPSHOT"
+ARG COMMIT="test"
+
+ENV BUILD_VERSION=${BUILD_VERSION}
+ENV BUILD_DATE=${BUILD_DATE}
+ENV COMMIT=${COMMIT}
+
+COPY . /usr/src/mymaven
+WORKDIR /usr/src/mymaven
+
+RUN mvn -DskipTests package
+
+FROM openjdk:8-jre-alpine
 
 ENV	SERVICE_USER=myuser \
 	SERVICE_UID=10001 \
@@ -14,7 +29,7 @@ RUN	addgroup -g ${SERVICE_GID} ${SERVICE_GROUP} && \
 	setcap 'cap_net_bind_service=+ep' $(readlink -f $(which java))
 
 WORKDIR /usr/src/app
-COPY *.jar ./app.jar
+COPY --from=build /usr/src/mymaven/target/queue-master.jar ./app.jar
 
 RUN	chown -R ${SERVICE_USER}:${SERVICE_GROUP} ./app.jar
 
