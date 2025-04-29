@@ -14,7 +14,7 @@ class JavaServices(unittest.TestCase):
                    '-v', home + '/.m2:/root/.m2',
                    '-v', code_dir + ':/usr/src/mymaven',
                    '-w', '/usr/src/mymaven',
-                   'maven:3.2-jdk-8',
+                   'maven:3.8-jdk-8',
                    'mvn',
                    '-DrepoToken=' + os.getenv('COVERALLS_TOKEN'),
                    '-DserviceJobId=' + os.getenv('TRAVIS_JOB_ID'),
